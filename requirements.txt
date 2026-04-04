@@ -1,6 +1,18 @@
 aiogram[fast]==3.26.*
-torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+aiohttp
+httpx
+torch torchvision torchaudio
 transformers
+diffusers
 Pillow
+opencv-python
 nudenet
+onnxruntime
+sqlalchemy
+redis
 python-dotenv
+psutil
+loguru
+uvloop
+orjson
+psutil 
