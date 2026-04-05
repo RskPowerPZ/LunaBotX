@@ -1,6 +1,6 @@
-from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy import Column, Integer, String, Float, DateTime
+from sqlalchemy.orm import declarative_base, sessionmaker
 import redis.asyncio as redis
 from datetime import datetime
 from loguru import logger
@@ -17,20 +17,43 @@ class NSFWLog(Base):
     content_type = Column(String)
     timestamp = Column(DateTime, default=datetime.utcnow)
 
-engine = create_engine(os.getenv("DATABASE_URL"), echo=False)
-SessionLocal = sessionmaker(bind=engine)
-redis_client = redis.from_url(os.getenv("REDIS_URL"))
+# Force SQLite + aiosqlite (no psycopg2 interference)
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///nsfw_logs.db")
+if not DATABASE_URL.startswith("sqlite+aiosqlite"):
+    DATABASE_URL = "sqlite+aiosqlite:///nsfw_logs.db"
+
+engine = create_async_engine(
+    DATABASE_URL,
+    echo=False,
+    future=True,
+    connect_args={"check_same_thread": False}  # SQLite safety
+)
+
+AsyncSessionLocal = sessionmaker(
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False
+)
+
+redis_client = redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379/0"))
 
 async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    logger.success("✅ Database initialized (SQLite + async)")
 
 async def log_nsfw(user_id: int, chat_id: int, score: float, content_type: str):
     try:
-        session = SessionLocal()
-        log = NSFWLog(user_id=user_id, chat_id=chat_id, score=score, content_type=content_type)
-        session.add(log)
-        session.commit()
+        async with AsyncSessionLocal() as session:
+            async with session.begin():
+                log = NSFWLog(
+                    user_id=user_id,
+                    chat_id=chat_id,
+                    score=score,
+                    content_type=content_type
+                )
+                session.add(log)
+        
         await redis_client.incr("total_deleted")
         await redis_client.incr(f"deleted:{datetime.utcnow().strftime('%Y-%m-%d')}")
         logger.success(f"NSFW logged | Score: {score:.2f}")
