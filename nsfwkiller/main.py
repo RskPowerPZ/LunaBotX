@@ -13,7 +13,6 @@ from nsfwkiller.utils.keyboard import get_main_keyboard
 from nsfwkiller.utils.database import init_db, log_nsfw, get_stats
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-
 logger.add("nsfw_bot.log", rotation="10 MB", level="INFO", colorize=True)
 
 bot = Bot(token=BOT_TOKEN, parse_mode="HTML")
@@ -21,30 +20,29 @@ dp = Dispatcher()
 
 @dp.message(Command("start"))
 async def start_cmd(message: types.Message):
-    await message.answer(
-        "<b>🔥 NSFW Killer Bot Activated</b>\n"
-        "Har photo, video, GIF, sticker, document auto scan & delete if 18+.",
-        reply_markup=get_main_keyboard()
+    help_text = (
+        "<b>🔥 NSFW Killer Bot Activated</b>\n\n"
+        "✅ Har photo, video, GIF, sticker, document auto scan hota hai\n"
+        "🚫 NSFW content turant delete + log\n"
+        "📊 /stats → Total deleted count\n"
+        "⚙️ Admin commands available\n\n"
+        "<i>Bot ko group mein Admin banao with Delete + Restrict rights.</i>"
     )
+    await message.answer(help_text, reply_markup=get_main_keyboard())
 
 @dp.message(lambda m: m.chat.type in ["group", "supergroup"] and (m.photo or m.video or m.animation or m.sticker or m.document))
 async def delete_nsfw(message: types.Message):
     if not message.from_user:
         return
-
     content_type = "video" if message.video else "photo"
     file = await bot.download(message)
     file_bytes = await file.read()
-
     is_nsfw_flag, score = await is_nsfw(file_bytes, content_type)
-    
     if is_nsfw_flag:
         await message.delete()
-        warn = f"🚫 <b>NSFW Content Deleted</b>\nScore: {score:.2f}\nUser: {message.from_user.mention}"
+        warn = f"🚫 <b>NSFW Deleted</b>\nScore: {score:.2f}\nUser: {message.from_user.mention}"
         await message.answer(warn)
-        
         await log_nsfw(message.from_user.id, message.chat.id, score, content_type)
-        
         if AUTO_MUTE:
             try:
                 await bot.restrict_chat_member(message.chat.id, message.from_user.id, permissions=types.ChatPermissions(can_send_messages=False))
@@ -74,7 +72,7 @@ async def callback_handler(callback: types.CallbackQuery):
 
 async def main():
     await init_db()
-    logger.info("🚀 NSFW Killer Bot Started with all pro libraries (uvloop + Redis + OpenCV + ONNX)")
+    logger.info("🚀 NSFW Killer Bot Started (uvloop + Redis + OpenCV + colored buttons)")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
