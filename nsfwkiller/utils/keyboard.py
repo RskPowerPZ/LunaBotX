@@ -11,5 +11,9 @@ def get_main_keyboard():
         ],
         [
             InlineKeyboardButton(text="🔥 NSFW Killer", callback_data="emoji_test", icon_custom_emoji_id="5474667187258006816")
+        ],
+        [
+            InlineKeyboardButton(text="📊 Stats", callback_data="stats"),
+            InlineKeyboardButton(text="❔ Help", callback_data="help")
         ]
     ])
