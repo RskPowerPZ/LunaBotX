@@ -99,8 +99,9 @@ It actively scans incoming media including images, videos, GIFs, stickers, anima
 ### <span style="color:#00C897;">Clone Repository</span>
 
 ```bash
-git clone https://github.com/yourusername/nsfw-killer-bot.git
-cd nsfw-killer-bot
+git clone
+(https://github.com/RskPowerPZ/LunaBotX.git)
+cd nsfwkillerbot 
 Install Dependencies
 Bash
 pip install -r requirements.txt
