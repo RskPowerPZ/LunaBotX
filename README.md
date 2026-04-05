@@ -125,7 +125,7 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install python3.11 python3-pip python3-venv git -y
 
 git clone https://github.com/yourusername/nsfw-killer-bot.git
-cd nsfw-killer-bot
+cd LunaBotX 
 
 python3 -m venv venv
 source venv/bin/activate
@@ -133,25 +133,5 @@ pip install -r requirements.txt
 Run in Background
 Bash
 screen -S lunabotx
-python bot.py
-PM2 (Recommended)
-Bash
-npm install -g pm2
-pm2 start bot.py --name "lunabotx" --interpreter python3
-pm2 save
-pm2 startup
-Configuration Reference
-�
-ParameterDescriptionNSFW_THRESHOLDControls strictness levelAUTO_MUTEEnable or disable mutingAUTO_BANEnable or disable banningMUTE_DURATIONMute duration in seconds
-Additional Notes
-Runs completely offline after setup
-No subscription or API costs
-Designed for high-traffic groups
-Efficient and lightweight
-Contributing
-Contributions are welcome. Open an issue before submitting major changes.
-License
-MIT License
-�
-If this project helps you, consider giving it a star 
+python main.py
 ```
