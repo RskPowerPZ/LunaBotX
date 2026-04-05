@@ -1,3 +1,4 @@
+
 <div align="center">
 
   <!-- Neon Header with Glow -->
@@ -113,3 +114,36 @@ Yeh images, videos, GIFs, stickers, animations aur documents sab ko scan karta h
 ```bash
 git clone https://github.com/RskPowerPZ/LunaBotX.git
 cd LunaBotX
+2. Install Dependencies
+pip install -r requirements.txt
+3. Configuration
+Apne config.py ya environment mein yeh values daal do:
+API_ID = 12345678
+API_HASH = "your_api_hash_here"
+BOT_TOKEN = "your_bot_token_here"
+
+NSFW_THRESHOLD = 0.65      # 0.0 to 1.0 (higher = stricter)
+AUTO_MUTE = True
+AUTO_BAN = False
+MUTE_DURATION = 3600       # seconds
+4. Run the Bot
+python bot.py
+Production Deployment (VPS)
+# Update system
+sudo apt update && sudo apt upgrade -y
+sudo apt install python3.11 python3-pip python3-venv git screen -y
+
+# Clone & Setup
+git clone https://github.com/RskPowerPZ/LunaBotX.git
+cd LunaBotX
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+Background mein chalane ke liye:
+screen -S lunabotx
+python bot.py
+PM2 (Recommended):
+npm install -g pm2
+pm2 start bot.py --name "lunabotx" --interpreter python3
+pm2 save
+pm2 startup
